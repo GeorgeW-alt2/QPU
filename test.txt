@@ -1,0 +1,22 @@
+Frame: 82, 2025-01-16 15:17:16, ACKs/Refresh: 0.0, ACKs/Second: 0.0, Total ACKs: 740, Delta: 0, Elapsed: 43.73s, Ghost Protocol: 126, Ghost Value: 126, , OR Duration: 0.04s, AND Duration: 43.41s
+
+can you find the approx optimal path if i give the number 126
+
+cities = 8  # Using 8 fixed cities
+    distances = [
+        [0, 10, 15, 20, 25, 30, 35, 40],
+        [10, 0, 35, 25, 30, 20, 15, 45],
+        [15, 35, 0, 30, 20, 25, 40, 15],
+        [20, 25, 30, 0, 15, 40, 35, 20],
+        [25, 30, 20, 15, 0, 35, 20, 25],
+        [30, 20, 25, 40, 35, 0, 15, 30],
+        [35, 15, 40, 35, 20, 15, 0, 25],
+        [40, 45, 15, 20, 25, 30, 25, 0]
+    ] 
+
+The approximate optimal path is:
+
+Route: [6 → 5 → 1 → 0 → 2 → 7 → 3 → 4 → 6]
+Total Distance: 130
+
+This route starts at city 6 and follows the sequence of cities as listed, returning to city 6 at the end. Let me know if you'd like further adjustments or details! ​
