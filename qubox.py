@@ -383,7 +383,7 @@ class QuantumCommunicator:
                     self.harmony_start = self.cyc
                 self.current_harmonies += 1
             else:
-                if self.harmony_start is not None and self.current_harmonies > 7 and self.current_harmonies < 10:
+                if self.harmony_start is not None and self.current_harmonies > 7 and self.current_harmonies < 11:
                     # Record completed harmony period
                     self.harmony_periods.append({
                         'start': self.harmony_start,
