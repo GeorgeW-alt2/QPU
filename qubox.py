@@ -6,7 +6,7 @@ from collections import deque
 import random
 import time
 import matplotlib.pyplot as plt
-PIN = 270000
+PIN = 280000
 
 class QuantumCommunicator:
     def __init__(self, sensitivity):
