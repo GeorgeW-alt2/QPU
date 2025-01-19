@@ -69,179 +69,165 @@ class QuantumCommunicator:
         self.and_state_duration = 0
         self.and_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_and_state_time = None
-    def find_flattest_region(self, data, window_size=20):
-        """Find the flattest contiguous region in the data"""
-        if len(data) < window_size:
-            return 0, len(data)
-        
-        min_variance = float('inf')
-        start_idx = 0
-        
-        # Slide window through data to find minimum variance section
-        for i in range(len(data) - window_size + 1):
-            window = data[i:i + window_size]
-            variance = np.var(window)
-            
-            if variance < min_variance:
-                min_variance = variance
-                start_idx = i
-                
-        return start_idx, start_idx + window_size
-
-    def plot_ack_data(self):
-        """Plot ACK data with highlighted flattest region"""
-        plt.figure(figsize=(12, 8))
-        
-        # Get data for plotting
-        raw_data = [stats['raw_acks_per_second'] for stats in self.ack_history]
-        filtered_data = [stats['acks_per_second'] for stats in self.ack_history]
-        times = range(len(filtered_data))
-        
-        # Calculate uncertainty bands
-        if hasattr(self, 'uncertainty_factor'):
-            uncertainty = self.uncertainty_factor * np.array(filtered_data)
-            upper_band = np.array(filtered_data) + uncertainty
-            lower_band = np.array(filtered_data) - uncertainty
-            
-            # Find flattest region in the uncertainty band difference
-            band_diff = upper_band - lower_band
-            flat_start, flat_end = self.find_flattest_region(band_diff)
-            
-            # Plot base data
-            plt.plot(raw_data, label="Raw Signal", color="gray", alpha=0.4)
-            plt.fill_between(times, lower_band, upper_band, 
-                            color="blue", alpha=0.2, label="Uncertainty Band")
-            
-            # Highlight flattest region
-            plt.axvspan(flat_start, flat_end, color='green', alpha=0.2, 
-                       label=f'Flattest Region (var={np.var(band_diff[flat_start:flat_end]):.6f})')
-            
-            # Add annotations
-            plt.annotate(f'Start: {flat_start}', 
-                        xy=(flat_start, np.mean([upper_band[flat_start], lower_band[flat_start]])),
-                        xytext=(10, 30), textcoords='offset points',
-                        arrowprops=dict(arrowstyle="->"))
-            plt.annotate(f'End: {flat_end}', 
-                        xy=(flat_end, np.mean([upper_band[flat_end-1], lower_band[flat_end-1]])),
-                        xytext=(10, -30), textcoords='offset points',
-                        arrowprops=dict(arrowstyle="->"))
-        
-        plt.title("ACK Rates with Flattest Region Highlighted")
-        plt.xlabel("Time Steps")
-        plt.ylabel("ACKs per Second")
-        plt.legend(loc='upper left')
-        plt.grid(True)
-        
-        # Add statistical information
-        if hasattr(self, 'uncertainty_factor'):
-            flat_region_stats = f"Flattest Region Stats:\nStart: {flat_start}\nEnd: {flat_end}\n" \
-                               f"Length: {flat_end - flat_start}\n" \
-                               f"Variance: {np.var(band_diff[flat_start:flat_end]):.6f}"
-            plt.text(0.02, 0.98, flat_region_stats,
-                    transform=plt.gca().transAxes,
-                    verticalalignment='top',
-                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-        
-        plt.tight_layout()
-        plt.show()
+    
     def analyze_ack_rate(self):
-        """Calculate ACK rate with quantum-inspired filtering"""
+        """Calculate ACK rate statistics with baseline comparison"""
         current_time = datetime.now()
         elapsed_time = (current_time - self.start_time).total_seconds()
         
-        # Calculate basic rates
+        # Calculate rates
         ack_delta = self.ack - self.last_ack_count
         refreshes = elapsed_time / self.status_update_interval
-        
-        # Initialize wave packet parameters if not exist
-        if not hasattr(self, 'wave_history'):
-            self.wave_history = deque(maxlen=20)  # Quantum well width
-            self.uncertainty_factor = 0.3  # Heisenberg uncertainty parameter
-            self.well_depth = 2.0  # Potential well depth
-            
         current_acks_per_second = ack_delta / elapsed_time if elapsed_time > 0 else 0
-        self.wave_history.append(current_acks_per_second)
         
-        if len(self.wave_history) >= 3:
-            # Apply quantum well filtering
-            filtered_rate = self._quantum_filter(list(self.wave_history))
+        # Initialize or update baseline
+        if not hasattr(self, 'baseline_ack_rate'):
+            self.baseline_ack_rate = current_acks_per_second
+            self.stable_periods = []
+            self.current_stable_start = None
+            self.baseline_buffer = []
+        
+        # Update moving baseline with decay
+        decay = 0.55  # Slower baseline adaptation
+        self.baseline_ack_rate = decay * self.baseline_ack_rate + (1 - decay) * current_acks_per_second
+        
+        # Track deviation from baseline
+        deviation = abs(current_acks_per_second - self.baseline_ack_rate)
+        stability_threshold = 0.2 * self.baseline_ack_rate  # 10% of baseline
+        
+        # Track stability periods
+        if deviation <= stability_threshold:
+            if self.current_stable_start is None:
+                self.current_stable_start = self.i
         else:
-            filtered_rate = current_acks_per_second
-        
-        # Track oscillation phases for further filtering
-        if not hasattr(self, 'phase_history'):
-            self.phase_history = deque(maxlen=10)
-        
-        if len(self.wave_history) >= 2:
-            phase = np.arctan2(current_acks_per_second - filtered_rate, 
-                              self.uncertainty_factor)
-            self.phase_history.append(phase)
+            if self.current_stable_start is not None:
+                if self.i - self.current_stable_start > 5:  # Minimum stable period
+                    self.stable_periods.append((self.current_stable_start, self.i))
+                self.current_stable_start = None
         
         stats = {
             'acks_per_refresh': round(ack_delta / refreshes if refreshes > 0 else 0, 2),
-            'acks_per_second': round(filtered_rate, 2),
-            'raw_acks_per_second': round(current_acks_per_second, 2),
+            'acks_per_second': round(current_acks_per_second, 2),
+            'raw_acks_per_second': round(current_acks_per_second, 2),  # Added missing key
+            'baseline_rate': round(self.baseline_ack_rate, 2),
+            'deviation': round(deviation, 2),
             'total_acks': self.ack,
             'ack_delta': ack_delta,
-            'elapsed_time': round(elapsed_time, 2),
-            'uncertainty': self.uncertainty_factor
+            'elapsed_time': round(elapsed_time, 2)
         }
         
         self.last_ack_count = self.ack
         self.ack_history.append(stats)
         return stats
 
-    def _quantum_filter(self, wave_data):
-        """Apply quantum-inspired filtering to the signal"""
-        if len(wave_data) < 3:
-            return wave_data[-1]
+    def find_slope_stable_periods(self, data, window_size=3):
+        """Find periods where rate changes with consistent slope"""
+        stable_periods = []
+        if len(data) < window_size:
+            return stable_periods
         
-        # Calculate wave packet spread
-        mean = np.mean(wave_data)
-        std = np.std(wave_data)
+        for i in range(len(data) - window_size):
+            window = data[i:i + window_size]
+            # Calculate slopes between consecutive points
+            slopes = np.diff(window)
+            # Check slope consistency (low variance in slopes)
+            slope_variance = np.var(slopes)
+            mean_slope = np.mean(slopes)
+            
+            # Detect consistent non-zero slope (steady increase/decrease)
+            if slope_variance < 0.02 and abs(mean_slope) > 0.002:
+                if not stable_periods or i > stable_periods[-1][1] + 2:
+                    stable_periods.append([i, i + window_size, mean_slope])
+                else:
+                    # Extend existing period if slopes are similar
+                    prev_slope = stable_periods[-1][2]
+                    if abs(mean_slope - prev_slope) < 0.01:
+                        stable_periods[-1][1] = i + window_size
+                        stable_periods[-1][2] = (prev_slope + mean_slope) / 2
         
-        # Adjust uncertainty based on signal variation
-        self.uncertainty_factor = min(0.5, std / (mean + 1e-6))
-        
-        # Apply potential well damping
-        weights = np.exp(-np.abs(np.array(range(len(wave_data))) - 
-                                len(wave_data)) / self.well_depth)
-        weights = weights / np.sum(weights)
-        
-        # Filter signal
-        filtered_value = np.sum(weights * wave_data)
-        
-        return filtered_value
+        return stable_periods
 
     def plot_ack_data(self):
-        """Plot ACK data with quantum filtering visualization"""
+        """Plot ACK data highlighting slope-stable regions"""
         plt.figure(figsize=(12, 8))
         
-        # Plot filtered vs raw ACK rates
-        plt.subplot(2, 1, 1)
-        raw_data = [stats['raw_acks_per_second'] for stats in self.ack_history]
-        filtered_data = [stats['acks_per_second'] for stats in self.ack_history]
+        # Get data for plotting
+        refresh_data = [stats['acks_per_refresh'] for stats in self.ack_history]
+        times = range(len(refresh_data))
         
-        plt.plot(raw_data, label="Raw Signal", color="gray", alpha=0.4)
+        # Plot base data
+        plt.plot(refresh_data, label="ACK/Refresh", color="gray", alpha=0.4)
         
-        # Add uncertainty bands
-        if hasattr(self, 'uncertainty_factor'):
-            uncertainty = self.uncertainty_factor * np.array(filtered_data)
-            times = range(len(filtered_data))
-            plt.fill_between(times, 
-                            np.array(filtered_data) - uncertainty,
-                            np.array(filtered_data) + uncertainty,
-                            color="blue", alpha=0.2, label="Uncertainty Band")
+        # Find and highlight slope-stable regions
+        stable_periods = self.find_slope_stable_periods(refresh_data)
         
-        plt.title("Uncertainty factor over time")
+        # Color coding for slopes (red for increasing, blue for decreasing)
+        for start, end, slope in stable_periods:
+            color = 'red' if slope > 0 else 'blue'
+            plt.axvspan(start, end, color=color, alpha=0.2)
+            
+            # Add slope annotation
+            mid_point = (start + end) // 2
+            plt.annotate(f'Slope: {slope:.3f}',
+                        xy=(mid_point, refresh_data[mid_point]),
+                        xytext=(0, 10), textcoords='offset points',
+                        ha='center',
+                        bbox=dict(facecolor='white', alpha=0.7))
+        
+        plt.title("ACK/Refresh with Stable Slope Regions")
         plt.xlabel("Time Steps")
-        plt.ylabel("ACKs per Second")
-        plt.legend()
+        plt.ylabel("ACK/Refresh Rate")
         plt.grid(True)
+        plt.legend()
         
+        # Add slope stability metrics
+        if stable_periods:
+            metrics = "Stable Slopes:\n"
+            for i, (start, end, slope) in enumerate(stable_periods):
+                direction = "increasing" if slope > 0 else "decreasing"
+                metrics += f"Region {i+1}: {direction}\n"
+                metrics += f"Length: {end-start}\n"
+                metrics += f"Slope: {slope:.3f}\n"
+            
+            #plt.text(0.02, 0.98, metrics,
+                    #transform=plt.gca().transAxes,
+                    #verticalalignment='top',
+                    #bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
         
         plt.tight_layout()
         plt.show()
+
+    def log_ack_stats(self, stats):
+        """Enhanced logging with both raw and smoothed ACK rates"""
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = (
+            f"Frame: {self.i}, "
+            f"{current_time}, "
+            f"ACKs/Refresh: {stats['acks_per_refresh']}, "
+            f"Raw ACKs/Second: {stats['raw_acks_per_second']}, "
+            f"Smoothed ACKs/Second: {stats['acks_per_second']}, "
+            f"Total ACKs: {stats['total_acks']}, "
+            f"Delta: {stats['ack_delta']}, "
+            f"Elapsed: {stats['elapsed_time']}s, "
+            f"Ghost Protocol: {self.ghostprotocol}, "
+            f"Ghost Value: {self.ghostprotocol * self.range}, "
+            f"PIN: {self.PIN}"
+        )
+        
+        self.i += 1
+        
+        if self.last_or_state_time:
+            or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
+            log_entry += f", OR Duration: {or_duration:.2f}s"
+        
+        if self.last_and_state_time:
+            and_duration = (datetime.now() - self.last_and_state_time).total_seconds()
+            log_entry += f", AND Duration: {and_duration:.2f}s"
+        
+        log_entry += "\n"
+        
+        with open("ack_stats.log", "a") as f:
+            f.write(log_entry)
 
     def clear_console(self):
         """Clear the console screen"""
@@ -306,37 +292,6 @@ class QuantumCommunicator:
         
         self.last_status_update = current_time
         self.active_quadrants.clear()
-
-    def log_ack_stats(self, stats):
-        """Log ACK statistics and ghost protocol messages to a file"""
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_entry = (
-            f"Frame: {self.i}, "  # Add frame number
-            f"{current_time}, "
-            f"ACKs/Refresh: {stats['acks_per_refresh']}, "
-            f"ACKs/Second: {stats['acks_per_second']}, "
-            f"Total ACKs: {stats['total_acks']}, "
-            f"Delta: {stats['ack_delta']}, "
-            f"Elapsed: {stats['elapsed_time']}s, "
-            f"Ghost Protocol: {self.ghostprotocol}, "
-            f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"PIN: {self.PIN}"
-        )
-        self.i += 1
-        self.ack_data.append(stats['acks_per_refresh'])
-        self.ack_data.append(stats['acks_per_second'])
-        if self.last_or_state_time:
-            or_duration = (datetime.now() - self.last_or_state_time).total_seconds()
-            log_entry += f", OR Duration: {or_duration:.2f}s"
-        
-        if self.last_and_state_time:
-            and_duration = (datetime.now() - self.last_and_state_time).total_seconds()
-            log_entry += f", AND Duration: {and_duration:.2f}s"
-        
-        log_entry += "\n"
-        
-        with open("ack_stats.log", "a") as f:
-            f.write(log_entry)
 
     def process_camera(self):
         """Process camera feed and detect motion in quadrants"""
