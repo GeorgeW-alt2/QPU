@@ -69,40 +69,20 @@ class QuantumCommunicator:
         self.and_state_duration = 0
         self.and_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_and_state_time = None
-    def analyze_sliding_sum(self):
-        """Calculate and visualize sliding window sums of three datapoints"""
-        # Calculate sliding window sums
-        window_sums = []
-        for i in range(len(self.ack_data) - 2):  # -2 because we need 3 points
-            inverted_sum = sum(1/x if x != 0 else float('inf') for x in self.ack_data[i:i+3])
-       
-            window_sums.append(inverted_sum)
-        
-        # Plot original data and window sums
-        plt.figure(figsize=(12, 6))
-        
-        # Original data
-        plt.plot(self.ack_data, 'b-', alpha=0.5, label='Original Data')
-        
-        # Sliding window sums
-        plt.plot(range(1, len(window_sums) + 1), window_sums, 'r-', 
-                 linewidth=2, label='3-Point Window Inverted Sum')
-        
-        plt.grid(True)
-        plt.title('ACK/Refresh Data with 3-Point Sliding Window Inverted Sum')
-        plt.xlabel('Frame Number')
-        plt.ylabel('Value')
-        plt.legend()
-        plt.show()
-        
-        # Return the window sums for further analysis if needed
-        return window_sums
-
-    # Modified plot_ack_data method to include sliding window analysis
     def plot_ack_data(self):
-        """Plot the ACK data with sliding window analysis"""
-        # Add sliding window analysis
-        window_sums = self.analyze_sliding_sum()
+        """Plot the ACK and ACK/Second data."""
+        plt.figure(figsize=(10, 6))
+
+        # Plot ACK data
+        plt.subplot(2, 1, 1)
+        plt.plot(self.ack_data, label="ACK/Refresh Data", color="blue")
+        plt.title("ACK/Refresh Data Over Time")
+        plt.xlabel("Frame Number")
+        plt.ylabel("Count")
+        plt.legend()
+        
+        plt.tight_layout()
+        plt.show()
     def analyze_ack_rate(self):
         """Calculate and return ACK rate statistics"""
         current_time = datetime.now()
