@@ -391,7 +391,7 @@ class QuantumCommunicator:
                         'duration': self.current_harmonies,
                         'time': current_time.strftime('%H:%M:%S')
                     })
-                    print(f"Signature detected: {self.cyc}, {self.harmony_start*self.range}"
+                    print(f"Signature detected: {self.cyc*self.range}, {self.harmony_start*self.range}"
                           f"(Duration: {self.current_harmonies} cycles), PIN: {self.PIN}")
                 self.harmony_start = None
                 self.current_harmonies = 0
