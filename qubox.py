@@ -69,89 +69,6 @@ class QuantumCommunicator:
         self.and_state_duration = 0
         self.and_state_threshold = 3  # Number of consecutive seconds to trigger message
         self.last_and_state_time = None
-    def plot_ack_data(self):
-        """Plot the ACK and ACK/Second data."""
-        plt.figure(figsize=(10, 6))
-
-        # Plot ACK data
-        plt.subplot(2, 1, 1)
-        plt.plot(self.ack_data, label="ACK/Refresh Data", color="blue")
-        plt.title("ACK/Refresh Data Over Time")
-        plt.xlabel("Frame Number")
-        plt.ylabel("Count")
-        plt.legend()
-        
-        plt.tight_layout()
-        plt.show()
-    def analyze_ack_rate(self):
-        """Calculate ACK rate with quantum-inspired filtering"""
-        current_time = datetime.now()
-        elapsed_time = (current_time - self.start_time).total_seconds()
-        
-        # Calculate basic rates
-        ack_delta = self.ack - self.last_ack_count
-        refreshes = elapsed_time / self.status_update_interval
-        
-        # Initialize wave packet parameters if not exist
-        if not hasattr(self, 'wave_history'):
-            self.wave_history = deque(maxlen=20)  # Quantum well width
-            self.uncertainty_factor = 0.3  # Heisenberg uncertainty parameter
-            self.well_depth = 2.0  # Potential well depth
-            
-        current_acks_per_second = ack_delta / elapsed_time if elapsed_time > 0 else 0
-        self.wave_history.append(current_acks_per_second)
-        
-        if len(self.wave_history) >= 3:
-            # Apply quantum well filtering
-            filtered_rate = self._quantum_filter(list(self.wave_history))
-        else:
-            filtered_rate = current_acks_per_second
-        
-        # Track oscillation phases for further filtering
-        if not hasattr(self, 'phase_history'):
-            self.phase_history = deque(maxlen=10)
-        
-        if len(self.wave_history) >= 2:
-            phase = np.arctan2(current_acks_per_second - filtered_rate, 
-                              self.uncertainty_factor)
-            self.phase_history.append(phase)
-        
-        stats = {
-            'acks_per_refresh': round(ack_delta / refreshes if refreshes > 0 else 0, 2),
-            'acks_per_second': round(filtered_rate, 2),
-            'raw_acks_per_second': round(current_acks_per_second, 2),
-            'total_acks': self.ack,
-            'ack_delta': ack_delta,
-            'elapsed_time': round(elapsed_time, 2),
-            'uncertainty': self.uncertainty_factor
-        }
-        
-        self.last_ack_count = self.ack
-        self.ack_history.append(stats)
-        return stats
-
-    def _quantum_filter(self, wave_data):
-        """Apply quantum-inspired filtering to the signal"""
-        if len(wave_data) < 3:
-            return wave_data[-1]
-        
-        # Calculate wave packet spread
-        mean = np.mean(wave_data)
-        std = np.std(wave_data)
-        
-        # Adjust uncertainty based on signal variation
-        self.uncertainty_factor = min(0.5, std / (mean + 1e-6))
-        
-        # Apply potential well damping
-        weights = np.exp(-np.abs(np.array(range(len(wave_data))) - 
-                                len(wave_data)) / self.well_depth)
-        weights = weights / np.sum(weights)
-        
-        # Filter signal
-        filtered_value = np.sum(weights * wave_data)
-        
-        return filtered_value
-
     def find_flattest_region(self, data, window_size=20):
         """Find the flattest contiguous region in the data"""
         if len(data) < window_size:
@@ -227,10 +144,168 @@ class QuantumCommunicator:
         
         plt.tight_layout()
         plt.show()
+    def analyze_ack_rate(self):
+        """Calculate ACK rate with quantum-inspired filtering"""
+        current_time = datetime.now()
+        elapsed_time = (current_time - self.start_time).total_seconds()
+        
+        # Calculate basic rates
+        ack_delta = self.ack - self.last_ack_count
+        refreshes = elapsed_time / self.status_update_interval
+        
+        # Initialize wave packet parameters if not exist
+        if not hasattr(self, 'wave_history'):
+            self.wave_history = deque(maxlen=20)  # Quantum well width
+            self.uncertainty_factor = 0.3  # Heisenberg uncertainty parameter
+            self.well_depth = 2.0  # Potential well depth
+            
+        current_acks_per_second = ack_delta / elapsed_time if elapsed_time > 0 else 0
+        self.wave_history.append(current_acks_per_second)
+        
+        if len(self.wave_history) >= 3:
+            # Apply quantum well filtering
+            filtered_rate = self._quantum_filter(list(self.wave_history))
+        else:
+            filtered_rate = current_acks_per_second
+        
+        # Track oscillation phases for further filtering
+        if not hasattr(self, 'phase_history'):
+            self.phase_history = deque(maxlen=10)
+        
+        if len(self.wave_history) >= 2:
+            phase = np.arctan2(current_acks_per_second - filtered_rate, 
+                              self.uncertainty_factor)
+            self.phase_history.append(phase)
+        
+        stats = {
+            'acks_per_refresh': round(ack_delta / refreshes if refreshes > 0 else 0, 2),
+            'acks_per_second': round(filtered_rate, 2),
+            'raw_acks_per_second': round(current_acks_per_second, 2),
+            'total_acks': self.ack,
+            'ack_delta': ack_delta,
+            'elapsed_time': round(elapsed_time, 2),
+            'uncertainty': self.uncertainty_factor
+        }
+        
+        self.last_ack_count = self.ack
+        self.ack_history.append(stats)
+        return stats
+
+    def _quantum_filter(self, wave_data):
+        """Apply quantum-inspired filtering to the signal"""
+        if len(wave_data) < 3:
+            return wave_data[-1]
+        
+        # Calculate wave packet spread
+        mean = np.mean(wave_data)
+        std = np.std(wave_data)
+        
+        # Adjust uncertainty based on signal variation
+        self.uncertainty_factor = min(0.5, std / (mean + 1e-6))
+        
+        # Apply potential well damping
+        weights = np.exp(-np.abs(np.array(range(len(wave_data))) - 
+                                len(wave_data)) / self.well_depth)
+        weights = weights / np.sum(weights)
+        
+        # Filter signal
+        filtered_value = np.sum(weights * wave_data)
+        
+        return filtered_value
+
+    def plot_ack_data(self):
+        """Plot ACK data with quantum filtering visualization"""
+        plt.figure(figsize=(12, 8))
+        
+        # Plot filtered vs raw ACK rates
+        plt.subplot(2, 1, 1)
+        raw_data = [stats['raw_acks_per_second'] for stats in self.ack_history]
+        filtered_data = [stats['acks_per_second'] for stats in self.ack_history]
+        
+        plt.plot(raw_data, label="Raw Signal", color="gray", alpha=0.4)
+        
+        # Add uncertainty bands
+        if hasattr(self, 'uncertainty_factor'):
+            uncertainty = self.uncertainty_factor * np.array(filtered_data)
+            times = range(len(filtered_data))
+            plt.fill_between(times, 
+                            np.array(filtered_data) - uncertainty,
+                            np.array(filtered_data) + uncertainty,
+                            color="blue", alpha=0.2, label="Uncertainty Band")
+        
+        plt.title("Uncertainty factor over time")
+        plt.xlabel("Time Steps")
+        plt.ylabel("ACKs per Second")
+        plt.legend()
+        plt.grid(True)
+        
+        
+        plt.tight_layout()
+        plt.show()
 
     def clear_console(self):
         """Clear the console screen"""
         os.system('cls' if os.name == 'nt' else 'clear')
+
+    def display_status(self):
+        """Display current status information with ACK rate analysis"""
+        current_time = datetime.now()
+        if (current_time - self.last_status_update).total_seconds() < self.status_update_interval:
+            return
+            
+        self.clear_console()
+        ack_stats = self.analyze_ack_rate()
+
+        print("=" * 50)
+        print("QUANTUM COMMUNICATOR STATUS")
+        print("=" * 50)
+        print(f"Time: {current_time.strftime('%H:%M:%S')}")
+        
+        print(f"\nACK RATE ANALYSIS:")
+        print(f"ACKs per Refresh: {ack_stats['acks_per_refresh']}")
+        print(f"ACKs per Second: {ack_stats['acks_per_second']}")
+        print(f"Total ACKs: {ack_stats['total_acks']}")
+        print(f"Recent ACK Delta: {ack_stats['ack_delta']}")
+        print(f"Elapsed Time: {ack_stats['elapsed_time']}s")
+        
+        print(f"\nQUANTUM STATES:")
+        print(f"Current Quantum State (qu): {self.qu}")
+        print(f"Cycle Position (cyc): {self.cyc}/{len(self.numa.split(','))}")
+        print(f"Switch Counter (swi): {self.swi}/{self.longcyc}")
+        
+        print(f"\nDETECTION COUNTERS:")
+        print(f"AND Gate Detections: {self.and_count}/{self.corr}")
+        print(f"OR Gate Detections: {self.or_count}/{self.corr}")
+        if self.last_or_state_time:
+            or_duration = (current_time - self.last_or_state_time).total_seconds()
+            print(f"Current OR State Duration: {or_duration:.2f}s")
+        if self.last_and_state_time:
+            and_duration = (current_time - self.last_and_state_time).total_seconds()
+            print(f"Current AND State Duration: {and_duration:.2f}s")
+        motion_percentage = (self.motion_frame_count / max(1, self.total_frames)) * 100
+        print(f"Motion Detected: {self.motion_frame_count} frames ({motion_percentage:.1f}%)")
+        
+        print(f"\nPROTOCOL STATUS:")
+        print(f"Ghost Protocol Value: {self.ghostprotocol * self.range}")
+        print(f"Ghost Protocol State: {self.ghostprotocol * self.range}")
+        print(f"Prime State: {self.prime}")
+        print(f"Acknowledgments (ACK): {self.ack}")
+        print(f"Nullifications (NUL): {self.nul}")
+        
+        print(f"\nGHOST PROTOCOL OUTPUT:")
+        if self.ghost_messages:
+            for msg in self.ghost_messages:
+                print(msg)
+        else:
+            print("No ghost protocol messages yet")
+        
+        print("=" * 50)
+        
+        # Log ACK stats to file
+        self.log_ack_stats(ack_stats)
+        
+        self.last_status_update = current_time
+        self.active_quadrants.clear()
 
     def log_ack_stats(self, stats):
         """Log ACK statistics and ghost protocol messages to a file"""
@@ -262,9 +337,6 @@ class QuantumCommunicator:
         
         with open("ack_stats.log", "a") as f:
             f.write(log_entry)
-        
-        self.last_status_update = current_time
-        self.active_quadrants.clear()
 
     def process_camera(self):
         """Process camera feed and detect motion in quadrants"""
@@ -286,7 +358,7 @@ class QuantumCommunicator:
             self.data2 = gray
             
             # Display status in command line
-            self.log_ack_stats(self.analyze_ack_rate())
+            self.display_status()
             
             # Display the resulting frame
             cv2.imshow('Motion Detection', frame)
@@ -364,37 +436,9 @@ class QuantumCommunicator:
         self.it = 0
 
     def check_quantum_states(self):
-        """Check and process quantum states with harmony tracking"""
+        """Check and process quantum states"""
         check = self.numa.split(",")
         current_time = datetime.now()
-        
-        # Initialize harmony tracking if not exists
-        if not hasattr(self, 'harmony_periods'):
-            self.harmony_periods = []
-            self.harmony_start = None
-            self.current_harmonies = 0
-        
-        # Check for quantum harmony
-        if self.cyc < len(check):
-            is_harmonized = check[self.cyc] == str(self.qu)
-            
-            if is_harmonized:
-                if self.harmony_start is None:
-                    self.harmony_start =  str(self.qu)
-                self.current_harmonies += 1
-            else:
-                if self.harmony_start is not None and self.current_harmonies > 7 and self.current_harmonies < 9:
-                    # Record completed harmony period
-                    self.harmony_periods.append({
-                        'start': self.harmony_start,
-                        'end': self.cyc - 1,
-                        'duration': self.current_harmonies,
-                        'time': current_time.strftime('%H:%M:%S')
-                    })
-                    print(f"Signature detected: {self.cyc*self.range}, {self.harmony_start*self.range}"
-                          f"(Duration: {self.current_harmonies} cycles), PIN: {self.PIN}")
-                self.harmony_start = None
-                self.current_harmonies = 0
         
         # Process OR states
         if self.or_count > self.corr and self.cyc < len(check):
@@ -406,6 +450,7 @@ class QuantumCommunicator:
             
             if check[self.cyc] != str(self.qu):
                 if self.swi == self.longcyc:
+                    # Initialize the seed using the current time
                     seed = int(time.time())
                     random.seed(seed)
                     self.qu = np.random.randint(0, 2)
@@ -419,10 +464,48 @@ class QuantumCommunicator:
                 self.prime = min(self.prime + 1, self.prime_threshold)
                 
                 if or_duration >= self.or_state_threshold:
-                    message = f"Prolonged OR state: Duration {or_duration:.2f}s, Value: {self.qu}"
+                    message = f"Prolonged OR state detected: Duration {or_duration:.2f}s, Value: {self.qu}"
                     self.ghost_messages.append(message)
                 
                 self.process_ghost_protocol()
+        else:
+            if self.last_or_state_time is not None:
+                or_duration = (current_time - self.last_or_state_time).total_seconds()
+                if or_duration >= self.or_state_threshold:
+                    self.ghost_messages.append(f"OR state ended after {or_duration:.2f}s")
+            self.last_or_state_time = None
+        
+        # Process AND states
+        if self.and_count > self.corr and self.cyc < len(check):
+            if self.last_and_state_time is None:
+                self.last_and_state_time = current_time
+                self.ghost_messages.append(f"AND state initiated at {current_time.strftime('%H:%M:%S')}")
+            
+            and_duration = (current_time - self.last_and_state_time).total_seconds()
+            
+            if check[self.cyc] == str(self.qu):
+                if self.swi == self.longcyc:
+                    # Initialize the seed using the current time
+                    seed = int(time.time())
+                    random.seed(seed)
+                    self.qu = np.random.randint(0, 2)
+                    self.swi = 0
+                    self.prime = 0
+                self.swi += 1
+                self.Do = 1
+                self.ack += 1
+                self.and_count = 0
+                self.cyc += 1
+                if self.prime >= self.prime_threshold:
+                    self.prime = 0
+                else:
+                    self.prime += 1
+                
+                if and_duration >= self.and_state_threshold:
+                    message = f"Prolonged AND state detected: Duration {and_duration:.2f}s, Value: {self.qu}"
+                    self.ghost_messages.append(message)
+            else:
+                self.last_and_state_time = None
 
     def process_ghost_protocol(self):
         """Process ghost protocol states"""
@@ -477,6 +560,6 @@ if __name__ == "__main__":
         if hasattr(communicator, 'capture'):
             communicator.capture.release()
         cv2.destroyAllWindows()
-        #communicator.plot_ack_data()
-        input()
+        communicator.plot_ack_data()
+
         print("Shutdown complete.")
