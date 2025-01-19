@@ -6,7 +6,7 @@ from collections import deque
 import random
 import time
 import matplotlib.pyplot as plt
-PIN = 280000
+PIN = 26000
 
 class QuantumCommunicator:
     def __init__(self, sensitivity):
@@ -135,7 +135,7 @@ class QuantumCommunicator:
             mean_Vector = np.mean(Vectors)
             
             # Detect consistent non-zero Vector (steady increase/decrease)
-            if Vector_variance < 0.02 and abs(mean_Vector) > 0.002:
+            if Vector_variance < 0.02 and mean_Vector > 0.002:
                 if not stable_periods or i > stable_periods[-1][1] + 2:
                     stable_periods.append([i, i + window_size, mean_Vector])
                 else:
@@ -147,8 +147,22 @@ class QuantumCommunicator:
         
         return stable_periods
 
+    def find_matching_values(self, data, reference_idx=38, tolerance=0.01):
+        """Find positions where values match the reference value"""
+        if len(data) <= reference_idx:
+            return []
+        
+        reference_value = data[reference_idx]
+        matching_positions = []
+        
+        for i, value in enumerate(data):
+            if abs(value - reference_value) <= tolerance:
+                matching_positions.append((i, value))
+        
+        return matching_positions
+
     def plot_ack_data(self):
-        """Plot ACK data highlighting Vector-stable regions"""
+        """Plot ACK data highlighting matching values"""
         plt.figure(figsize=(12, 8))
         
         # Get data for plotting
@@ -158,41 +172,41 @@ class QuantumCommunicator:
         # Plot base data
         plt.plot(refresh_data, label="ACK/Refresh", color="gray", alpha=0.4)
         
-        # Find and highlight Vector-stable regions
-        stable_periods = self.find_Vector_stable_periods(refresh_data)
-        
-        # Color coding for Vectors (red for increasing, blue for decreasing)
-        for start, end, Vector in stable_periods:
-            color = 'red' if Vector > 0 else 'blue'
-            plt.axvspan(start, end, color=color, alpha=0.2)
+        # Find and highlight matching values
+        if len(refresh_data) > 38:
+            reference_value = refresh_data[38]
+            matching_positions = self.find_matching_values(refresh_data)
             
-            # Add Vector annotation
-            mid_point = (start + end) // 2
-            plt.annotate(f'Vector: {Vector:.3f}',
-                        xy=(mid_point, refresh_data[mid_point]),
-                        xytext=(0, 10), textcoords='offset points',
-                        ha='center',
-                        bbox=dict(facecolor='white', alpha=0.7))
+            # Add reference value annotation
+            plt.axhline(y=reference_value, color='blue', linestyle='--', alpha=0.3)
+            plt.text(0, reference_value, f'Reference: {reference_value:.3f}', 
+                    verticalalignment='bottom')
+            
+            # Highlight matches
+            for pos, value in matching_positions:
+                plt.axvspan(pos-1, pos+1, color='red', alpha=0.2)
+                #plt.annotate(f'Match: {value:.3f}',
+                            #xy=(pos, value),
+                            #xytext=(0, 10), textcoords='offset points',
+                            #ha='center',
+                            #bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
         
-        plt.title("ACK/Refresh with Stable Vector Regions")
+        plt.title("ACK/Refresh with Value Matches")
         plt.xlabel("Time Steps")
         plt.ylabel("ACK/Refresh Rate")
         plt.grid(True)
         plt.legend()
         
-        # Add Vector stability metrics
-        if stable_periods:
-            metrics = "Stable Vectors:\n"
-            for i, (start, end, Vector) in enumerate(stable_periods):
-                direction = "increasing" if Vector > 0 else "decreasing"
-                metrics += f"Region {i+1}: {direction}\n"
-                metrics += f"Length: {end-start}\n"
-                metrics += f"Vector: {Vector:.3f}\n"
+        # Add matching metrics
+        if len(refresh_data) > 38:
+            metrics = f"Reference Value: {reference_value:.3f}\n"
+            metrics += f"Total Matches: {len(matching_positions)}\n"
+            metrics += f"Match Positions: {[pos for pos, _ in matching_positions]}"
             
-            #plt.text(0.02, 0.98, metrics,
-                    #transform=plt.gca().transAxes,
-                    #verticalalignment='top',
-                    #bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+            plt.text(0.02, 0.98, metrics,
+                    transform=plt.gca().transAxes,
+                    verticalalignment='top',
+                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
         
         plt.tight_layout()
         plt.show()
