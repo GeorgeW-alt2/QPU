@@ -380,7 +380,7 @@ class QuantumCommunicator:
             
             if is_harmonized:
                 if self.harmony_start is None:
-                    self.harmony_start = self.cyc
+                    self.harmony_start =  str(self.qu)
                 self.current_harmonies += 1
             else:
                 if self.harmony_start is not None and self.current_harmonies > 7 and self.current_harmonies < 9:
@@ -391,7 +391,7 @@ class QuantumCommunicator:
                         'duration': self.current_harmonies,
                         'time': current_time.strftime('%H:%M:%S')
                     })
-                    print(f"Signature detected: {self.harmony_start*self.range}"
+                    print(f"Signature detected: {self.cyc}, {self.harmony_start*self.range}"
                           f"(Duration: {self.current_harmonies} cycles), PIN: {self.PIN}")
                 self.harmony_start = None
                 self.current_harmonies = 0
