@@ -120,35 +120,35 @@ class QuantumCommunicator:
         self.ack_history.append(stats)
         return stats
 
-    def find_slope_stable_periods(self, data, window_size=3):
-        """Find periods where rate changes with consistent slope"""
+    def find_Vector_stable_periods(self, data, window_size=3):
+        """Find periods where rate changes with consistent Vector"""
         stable_periods = []
         if len(data) < window_size:
             return stable_periods
         
         for i in range(len(data) - window_size):
             window = data[i:i + window_size]
-            # Calculate slopes between consecutive points
-            slopes = np.diff(window)
-            # Check slope consistency (low variance in slopes)
-            slope_variance = np.var(slopes)
-            mean_slope = np.mean(slopes)
+            # Calculate Vectors between consecutive points
+            Vectors = np.diff(window)
+            # Check Vector consistency (low variance in Vectors)
+            Vector_variance = np.var(Vectors)
+            mean_Vector = np.mean(Vectors)
             
-            # Detect consistent non-zero slope (steady increase/decrease)
-            if slope_variance < 0.02 and abs(mean_slope) > 0.002:
+            # Detect consistent non-zero Vector (steady increase/decrease)
+            if Vector_variance < 0.02 and abs(mean_Vector) > 0.002:
                 if not stable_periods or i > stable_periods[-1][1] + 2:
-                    stable_periods.append([i, i + window_size, mean_slope])
+                    stable_periods.append([i, i + window_size, mean_Vector])
                 else:
-                    # Extend existing period if slopes are similar
-                    prev_slope = stable_periods[-1][2]
-                    if abs(mean_slope - prev_slope) < 0.01:
+                    # Extend existing period if Vectors are similar
+                    prev_Vector = stable_periods[-1][2]
+                    if abs(mean_Vector - prev_Vector) < 0.01:
                         stable_periods[-1][1] = i + window_size
-                        stable_periods[-1][2] = (prev_slope + mean_slope) / 2
+                        stable_periods[-1][2] = (prev_Vector + mean_Vector) / 2
         
         return stable_periods
 
     def plot_ack_data(self):
-        """Plot ACK data highlighting slope-stable regions"""
+        """Plot ACK data highlighting Vector-stable regions"""
         plt.figure(figsize=(12, 8))
         
         # Get data for plotting
@@ -158,36 +158,36 @@ class QuantumCommunicator:
         # Plot base data
         plt.plot(refresh_data, label="ACK/Refresh", color="gray", alpha=0.4)
         
-        # Find and highlight slope-stable regions
-        stable_periods = self.find_slope_stable_periods(refresh_data)
+        # Find and highlight Vector-stable regions
+        stable_periods = self.find_Vector_stable_periods(refresh_data)
         
-        # Color coding for slopes (red for increasing, blue for decreasing)
-        for start, end, slope in stable_periods:
-            color = 'red' if slope > 0 else 'blue'
+        # Color coding for Vectors (red for increasing, blue for decreasing)
+        for start, end, Vector in stable_periods:
+            color = 'red' if Vector > 0 else 'blue'
             plt.axvspan(start, end, color=color, alpha=0.2)
             
-            # Add slope annotation
+            # Add Vector annotation
             mid_point = (start + end) // 2
-            plt.annotate(f'Slope: {slope:.3f}',
+            plt.annotate(f'Vector: {Vector:.3f}',
                         xy=(mid_point, refresh_data[mid_point]),
                         xytext=(0, 10), textcoords='offset points',
                         ha='center',
                         bbox=dict(facecolor='white', alpha=0.7))
         
-        plt.title("ACK/Refresh with Stable Slope Regions")
+        plt.title("ACK/Refresh with Stable Vector Regions")
         plt.xlabel("Time Steps")
         plt.ylabel("ACK/Refresh Rate")
         plt.grid(True)
         plt.legend()
         
-        # Add slope stability metrics
+        # Add Vector stability metrics
         if stable_periods:
-            metrics = "Stable Slopes:\n"
-            for i, (start, end, slope) in enumerate(stable_periods):
-                direction = "increasing" if slope > 0 else "decreasing"
+            metrics = "Stable Vectors:\n"
+            for i, (start, end, Vector) in enumerate(stable_periods):
+                direction = "increasing" if Vector > 0 else "decreasing"
                 metrics += f"Region {i+1}: {direction}\n"
                 metrics += f"Length: {end-start}\n"
-                metrics += f"Slope: {slope:.3f}\n"
+                metrics += f"Vector: {Vector:.3f}\n"
             
             #plt.text(0.02, 0.98, metrics,
                     #transform=plt.gca().transAxes,
@@ -466,7 +466,7 @@ class QuantumCommunicator:
         """Process ghost protocol states"""
         current_value = self.ghostprotocol * self.range
         
-        if self.prime < 1 and self.ghostprotocol > 3:
+        if self.prime < 1 and self.ghostprotocol > 0:
             if self.GhostIterate == 0:
                 self.ghostprotocollast = current_value
                 self.GhostIterate += 1
