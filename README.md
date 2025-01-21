@@ -9,3 +9,5 @@ Probabilistic Operations: Integrating probabilistic algorithms to manage resourc
 Scalable Architecture: Exploring modular designs to achieve scalability for more complex computations.
 
 Whether you're a researcher, developer, or enthusiast, this repository is designed to make photonic quantum processing accessible and extensible. Dive into the world of quantum photonics and contribute to the future of quantum technology!
+
+Operating notes: press ctrl-c to display the matlab plot
