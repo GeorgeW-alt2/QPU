@@ -56,7 +56,7 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
-        self.ghostprotocol = 5000#314159
+        self.ghostprotocol = 0#314159
                              
         self.ghostprotocollast = 0
         self.GhostIterate = 0
@@ -412,7 +412,7 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-        self.ghostprotocol -= 1
+        self.ghostprotocol += 1
         if self.ghostprotocol <= 0:
             exit()
     
