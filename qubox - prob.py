@@ -8,6 +8,30 @@ import time
 import matplotlib.pyplot as plt
 PIN = 26000
 
+#QPU test, remove this segment and analyse differences in the matlab plot
+#vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+csv_file = 'data.csv'  # Replace with your CSV file path
+
+# Load CSV into a NumPy array
+def load_csv_to_array(file_path, delimiter=','):
+    """
+    Load a CSV file into a NumPy array.
+    
+    Parameters:
+        file_path (str): Path to the CSV file.
+        delimiter (str): Delimiter used in the CSV file (default is ',').
+    
+    Returns:
+        np.ndarray: NumPy array with the contents of the CSV file.
+    """
+    try:
+        data = np.loadtxt(file_path, delimiter=delimiter, skiprows=1)  # Skip header if present
+        return data
+    except Exception as e:
+        print(f"Error loading CSV file: {e}")
+        return None
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#QPU test, remove this segment and analyse differences in the matlab plot
 class QuantumCommunicator:
     def __init__(self, sensitivity):
         # Camera and processing setup
