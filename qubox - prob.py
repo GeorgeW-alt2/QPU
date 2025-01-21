@@ -6,7 +6,6 @@ from collections import deque
 import random
 import time
 import matplotlib.pyplot as plt
-PIN = 26000
 
 #QPU test, remove this segment and analyse differences in the matlab plot
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -62,7 +61,6 @@ class QuantumCommunicator:
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
-        self.PIN = random.randint(5000, PIN) #Guess PIN, i.e max range 10000
         # ACK and status tracking
         self.ack = 0
         self.nul = 0
@@ -207,7 +205,7 @@ class QuantumCommunicator:
             f"Elapsed: {stats['elapsed_time']}s, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"PIN: {self.PIN}"
+
         )
         self.i += 1
         self.ack_data.append(stats['acks_per_refresh'])
