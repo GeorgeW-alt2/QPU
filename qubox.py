@@ -7,7 +7,7 @@ import random
 import time
 import matplotlib.pyplot as plt
 PIN = 26000
-
+spin = -1 #1 or -1
 class QuantumCommunicator:
     def __init__(self, sensitivity):
         # Camera and processing setup
@@ -391,7 +391,7 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-        self.ghostprotocol += 1
+        self.ghostprotocol += spin
         if self.ghostprotocol <= 0:
             exit()
     
