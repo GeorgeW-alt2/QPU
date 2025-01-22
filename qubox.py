@@ -6,29 +6,8 @@ from collections import deque
 import random
 import time
 import matplotlib.pyplot as plt
-
-csv_file = 'data.csv'  # Replace with your CSV file path
-
-# Load CSV into a NumPy array
-def load_csv_to_array(file_path, delimiter=','):
-    """
-    Load a CSV file into a NumPy array.
-    
-    Parameters:
-        file_path (str): Path to the CSV file.
-        delimiter (str): Delimiter used in the CSV file (default is ',').
-    
-    Returns:
-        np.ndarray: NumPy array with the contents of the CSV file.
-    """
-    try:
-        data = np.loadtxt(file_path, delimiter=delimiter, skiprows=1)  # Skip header if present
-        return data
-    except Exception as e:
-        print(f"Error loading CSV file: {e}")
-        return None
-
-data_array = load_csv_to_array(csv_file)
+PIN = 16000
+spin = 1 #1 or -1
 class QuantumCommunicator:
     def __init__(self, sensitivity):
         # Camera and processing setup
@@ -55,7 +34,12 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.prime = 0
-        self.ghostprotocol = 0
+        if spin == -1:
+            self.ghostprotocol = 5000
+        if spin == 1:
+            self.ghostprotocol = 0
+        self.PIN = random.randint(5000, PIN) #Guess PIN, i.e max range 10000
+
         self.ghostprotocollast = 0
         self.GhostIterate = 0
         self.testchecknum = 5
@@ -203,7 +187,7 @@ class QuantumCommunicator:
             f"Elapsed: {stats['elapsed_time']}s, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-
+            f"PIN: {self.PIN}"
         )
         self.i += 1
         self.ack_data.append(stats['acks_per_refresh'])
@@ -218,7 +202,7 @@ class QuantumCommunicator:
         
         log_entry += "\n"
         
-        with open("ack_stats.log", "a") as f:
+        with open("ack_stats.log", "w") as f:
             f.write(log_entry)
 
     def process_camera(self):
@@ -411,17 +395,15 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-        self.ghostprotocol += 1
+        self.ghostprotocol += spin
         if self.ghostprotocol <= 0:
             exit()
     
 def send_message(self):
         """Send a quantum message when conditions are met, could be a message or math."""
-
-        result = 314159# enter any algorithm to solve
-        if result <= data_array[self.ghostprotocol * self.range]:
+        problem = self.PIN # enter any math problem to solve
+        if problem <= self.ghostprotocol * self.range :
             self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
-
 
 if __name__ == "__main__":
     try:
