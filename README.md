@@ -10,4 +10,4 @@ Scalable Architecture: Exploring modular designs to achieve scalability for more
 
 Whether you're a researcher, developer, or enthusiast, this repository is designed to make photonic quantum processing accessible and extensible. Dive into the world of quantum photonics and contribute to the future of quantum technology!
 
-Operation notes: press ctrl-c to display the matlab plot. Use python 3.8, low entropy ~0.8 is a fault, use the mean sum to determine spin(with high max(>2.0) & entropy(>1.0)).
+Operation notes: press ctrl-c to display the matlab plot. Use python 3.8, low entropy ~0.8 is a fault, use the mean sum to determine spin(with high max(>2.0) & entropy(>1.5)).
