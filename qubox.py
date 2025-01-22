@@ -7,9 +7,9 @@ import random
 import time
 import matplotlib.pyplot as plt
 PIN = 16000
+spin = 1 #1 or -1
 with open("ack_stats.log", "w") as f:
     f.close()
-spin = -1 #1 or -1
 class QuantumCommunicator:
     def __init__(self, sensitivity):
         # Camera and processing setup
