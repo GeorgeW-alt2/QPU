@@ -398,7 +398,9 @@ class QuantumCommunicator:
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
         self.ghostprotocol += spin
-        if self.ghostprotocol <= 0:
+        if self.ghostprotocol <= 0 and spin == -1:
+            exit()
+        if self.ghostprotocol >= 5000 and spin == 1:
             exit()
     
 def send_message(self):
