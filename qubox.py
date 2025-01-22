@@ -6,8 +6,8 @@ from collections import deque
 import random
 import time
 import matplotlib.pyplot as plt
-PIN = 16000
-spin = 1 #1 or -1
+PIN = 10000
+spin = -1 #1 or -1
 with open("ack_stats.log", "w") as f:
     f.close()
 class QuantumCommunicator:
@@ -40,7 +40,7 @@ class QuantumCommunicator:
             self.ghostprotocol = 5000
         if spin == 1:
             self.ghostprotocol = 0
-        self.PIN = random.randint(5000, PIN) #Guess PIN, i.e max range 10000
+        self.PIN = PIN
 
         self.ghostprotocollast = 0
         self.GhostIterate = 0
