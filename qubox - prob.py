@@ -7,8 +7,6 @@ import random
 import time
 import matplotlib.pyplot as plt
 
-#QPU test, remove this segment and analyse differences in the matlab plot
-#vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 csv_file = 'data.csv'  # Replace with your CSV file path
 
 # Load CSV into a NumPy array
@@ -29,8 +27,8 @@ def load_csv_to_array(file_path, delimiter=','):
     except Exception as e:
         print(f"Error loading CSV file: {e}")
         return None
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#QPU test, remove this segment and analyse differences in the matlab plot
+
+data_array = load_csv_to_array(csv_file)
 class QuantumCommunicator:
     def __init__(self, sensitivity):
         # Camera and processing setup
