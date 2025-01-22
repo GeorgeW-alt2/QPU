@@ -7,7 +7,7 @@ import random
 import time
 import matplotlib.pyplot as plt
 PIN = 10000
-spin = -1 #1 or -1
+spin = 1 #1 or -1
 with open("ack_stats.log", "w") as f:
     f.close()
 class QuantumCommunicator:
@@ -397,7 +397,7 @@ class QuantumCommunicator:
                 msg = f"Protocol state: {current_value}"
                 self.ghost_messages.append(msg)
                 self.ghostprotocollast = current_value
-        self.ghostprotocol += spin
+        self.ghostprotocol -= spin
         if self.ghostprotocol <= 0 and spin == -1:
             exit()
         if self.ghostprotocol >= 5000 and spin == 1:
