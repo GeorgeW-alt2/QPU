@@ -162,7 +162,7 @@ class QuantumCommunicator:
         
     def update_ghost_protocol(self):
         current_value = self.ghostprotocol * self.range
-        if self.prime < 1 and self.ghostprotocol > 3:
+        if self.prime < 1:
             if current_value != self.last_ghost_value:
                 self.ghost_messages.append(f"Protocol state: {current_value}")
                 self.last_ghost_value = current_value
