@@ -7,9 +7,12 @@ import time
 import matplotlib.pyplot as plt
 from collections import deque
 
-PIN = random.randint(5000, 99999)
+PIN = random.randint(7000, 99999)
 spin = 1  # 1 or -1
 
+with open("data.csv", "r", encoding="utf-8") as f:
+    data = f.readlines()  
+    
 class QuantumCommunicator:
     def __init__(self, sensitivity=1500):
         self.sensitivity = sensitivity
@@ -19,8 +22,6 @@ class QuantumCommunicator:
         self.initialize_tracking_vars()
         with open("ack_stats.log", "w") as f:
             f.write("")
-        with open("auto_text_log.txt", "w", encoding="utf-8") as f:
-            f.write(f"=== New Session: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===\n")
         
     def initialize_quantum_vars(self):
         self.qu = 0
@@ -166,7 +167,6 @@ class QuantumCommunicator:
             self.i += 1
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
-            self.cleanup()
             exit()
         
     def log_ack_stats(self):
@@ -184,29 +184,11 @@ class QuantumCommunicator:
             f"PIN: {self.PIN}, "
             f"AND Count: {self.and_count}, "
             f"OR Count: {self.or_count}, "
-            f"Quantum State: {self.qu}, "
-            f"Cycle/10: {self.cyc/10}, "
-            f"PIN: {self.PIN}\n"
+            f"Quantum State: {self.qu}\n"
         )
         
         with open("ack_stats.log", "a") as f:
             f.write(log_entry)
-
-        # Status log
-        with open("auto_text_log.txt", "a", encoding="utf-8") as log:
-            log.write(f"""
-Frame {self.i}, {current_time}
-Time: {current_time}
-Quantum State: {self.qu}
-Cycle: {self.cyc}/{len(self.numa.split(','))}
-Ghost Protocol: {self.ghostprotocol * self.range}
-PIN: {self.PIN}
-ACK Rate: {self.calculate_ack_rate():.2f}/second
-Total ACK: {self.ack} | NUL: {self.nul}
-AND Count: {self.and_count} | OR Count: {self.or_count}
-
--------------------------
-""")
             
     def run(self):
         try:
@@ -227,37 +209,19 @@ AND Count: {self.and_count} | OR Count: {self.or_count}
                     
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
-        finally:
-            self.cleanup()
-            
-    def cleanupcleanup(self):
-        if hasattr(self, 'capture'):
-            self.capture.release()
-        cv2.destroyAllWindows()
-        self.plot_quantum_data()
-        
     def plot_quantum_data(self):
         plt.figure(figsize=(12, 8))
         
         # Plot ghost protocol states
         plt.subplot(2, 1, 1)
-        time_points = list(range(len(self.ghost_messages)))
-        plt.plot(time_points, [int(msg.split(": ")[1]) for msg in self.ghost_messages], 'b-')
+        if self.ghost_messages:
+            time_points = list(range(len(self.ghost_messages)))
+            states = [int(msg.split(": ")[1]) for msg in self.ghost_messages]
+            plt.plot(time_points, states, 'b-')
         plt.title("Ghost Protocol States")
         plt.xlabel("Time Steps")
         plt.ylabel("State Value")
         plt.grid(True)
-        
-        # Plot OR counts over time
-        plt.subplot(2, 1, 2)
-        time_points = list(range(len(self.or_counts)))
-        plt.plot(time_points, self.or_counts, 'r-', label='OR Count')
-        plt.title("OR Count Over Time")
-        plt.xlabel("Frame Number")
-        plt.ylabel("Cumulative OR Count")
-        plt.grid(True)
-        plt.legend()
-        
         plt.tight_layout()
         plt.show()
         
@@ -284,6 +248,17 @@ Motion Frames: {self.motion_frame_count}/{self.total_frames}
 -------------------------
 """)
 
+def send_message(self):
+    """Send a quantum message when conditions are met, could be a message or math."""
+    with open("input.txt", "r", encoding="utf-8") as f:
+        _input = f.read()
+    result = _input# enter any algorithm to solve
+    if result <= data[self.ghostprotocol * self.range]:
+        self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
+        
 if __name__ == "__main__":
     communicator = QuantumCommunicator()
     communicator.run()
+    self.capture.release()
+    cv2.destroyAllWindows()
+   
