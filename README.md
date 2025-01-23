@@ -10,4 +10,4 @@ Scalable Architecture: Exploring modular designs to achieve scalability for more
 
 Whether you're a researcher, developer, or enthusiast, this repository is designed to make photonic quantum processing accessible and extensible. Dive into the world of quantum photonics and contribute to the future of quantum technology!
 
-Operation notes: Use python 3.8. Typically search for cluserted high OR rates.
+Operation notes: Use python 3.8. Typically search for clustered high OR rates.
