@@ -252,8 +252,8 @@ AND Count: {self.and_count} | OR Count: {self.or_count}
         
         # Plot ACK rates
         plt.subplot(2, 1, 2)
-        time_points = list(range(len(self.ack_rates)))
-        plt.plot(time_points, list(self.ack_rates), 'g-')
+        time_points = list(range(len(self.or_count)))
+        plt.plot(time_points, list(self.or_count), 'g-')
         plt.title("ACK Rates Over Time")
         plt.xlabel("Time Steps")
         plt.ylabel("ACKs/Second")
