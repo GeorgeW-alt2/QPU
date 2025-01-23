@@ -181,6 +181,7 @@ class QuantumCommunicator:
             f"Total ACKs: {self.ack}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
+            f"PIN: {self.PIN}, "
             f"AND Count: {self.and_count}, "
             f"OR Count: {self.or_count}, "
             f"Quantum State: {self.qu}, "
