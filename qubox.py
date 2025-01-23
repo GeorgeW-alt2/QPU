@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 from collections import deque
 
-PIN = random.randint(7000, 99999)
+#PIN = random.randint(7000, 99999)
 spin = 1  # 1 or -1
 
 with open("data.csv", "r", encoding="utf-8") as f:
@@ -32,7 +32,6 @@ class QuantumCommunicator:
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
         self.ghostprotocol = 10000 if spin == -1 else 0
-        self.PIN = PIN
         
     def initialize_tracking_vars(self):
         self.ack = 0
@@ -181,7 +180,6 @@ class QuantumCommunicator:
             f"Total ACKs: {self.ack}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"PIN: {self.PIN}, "
             f"AND Count: {self.and_count}, "
             f"OR Count: {self.or_count}, "
             f"Quantum State: {self.qu}\n"
@@ -236,7 +234,7 @@ Time: {datetime.now().strftime('%H:%M:%S')}
 Quantum State: {self.qu}
 Cycle: {self.cyc}/{len(self.numa.split(','))}
 Ghost Protocol: {self.ghostprotocol * self.range}
-PIN: {self.PIN}
+
 
 Performance Metrics
 -----------------
@@ -252,7 +250,7 @@ def send_message(self):
     """Send a quantum message when conditions are met, could be a message or math."""
     with open("input.txt", "r", encoding="utf-8") as f:
         _input = f.read()
-    result = _input# enter any algorithm to solve
+    result = eval(_input)# enter any algorithm to solve
     if result <= data[self.ghostprotocol * self.range]:
         self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
         
