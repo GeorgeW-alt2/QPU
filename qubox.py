@@ -180,7 +180,7 @@ class QuantumCommunicator:
             f"Frame {self.i}, {current_time}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"OR Count: {self.or_count}, "
+            f"OR Count: {self.or_count}\n "
         )
         
         self.logs.append(log_entry)
@@ -260,4 +260,3 @@ if __name__ == "__main__":
     communicator.run()
     communicator.capture.release()
     cv2.destroyAllWindows()
-    input("Press enter to exit.")
