@@ -12,4 +12,4 @@ Whether you're a researcher, developer, or enthusiast, this repository is design
 
 Operation notes: Use python 3.8. Typically search for clustered high OR rates.
 
-testing the quantum calculator.
+Currently testing the quantum calculator (qubox.py).
