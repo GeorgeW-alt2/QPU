@@ -7,12 +7,11 @@ import time
 import matplotlib.pyplot as plt
 from collections import deque
 
-#PIN = random.randint(7000, 99999)
 spin = 1  # 1 or -1
-
+problem = input("Enter math problem: ")
 with open("data.csv", "r", encoding="utf-8") as f:
     data = f.readlines()  
-    
+print("Solving: ", problem)
 class QuantumCommunicator:
     def __init__(self, sensitivity=1500):
         self.sensitivity = sensitivity
@@ -20,6 +19,8 @@ class QuantumCommunicator:
         self.data2 = None
         self.initialize_quantum_vars()
         self.initialize_tracking_vars()
+        self.logs = []
+        self.or_states = []
         with open("ack_stats.log", "w") as f:
             f.write("")
         
@@ -50,8 +51,9 @@ class QuantumCommunicator:
         self.and_count = 0
         self.or_count = 0
         self.last_ghost_value = 0
-        self.range = 10
+        self.range = int(input("Range(e.g, 10): "))
         self.i = 0
+
     def calculate_ack_rate(self):
         current_time = time.time()
         time_diff = max(0.1, current_time - self.last_ack_time)
@@ -82,6 +84,7 @@ class QuantumCommunicator:
         thresh = cv2.threshold(frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
         self.process_quadrants(thresh, frame)
         self.data2 = gray
+        self.total_frames += 1
         
         return True
 
@@ -141,6 +144,7 @@ class QuantumCommunicator:
         self.swi += 1
         self.nul += 1
         self.prime = min(self.prime + 1, self.prime_threshold)
+        self.or_states.append(self.or_count)
         self.advance_cycle()
         
     def process_and_state(self):
@@ -166,28 +170,31 @@ class QuantumCommunicator:
             self.i += 1
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
+            self.print_all_logs()
             exit()
         
     def log_ack_stats(self):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        # Detailed CSV log
         log_entry = (
             f"Frame {self.i}, {current_time}, "
-            f"{current_time}, "
-            f"ACKs/Second: {self.calculate_ack_rate():.2f}, "
-            f"Avg ACKs/Second: {self.get_average_ack_rate():.2f}, "
-            f"Total ACKs: {self.ack}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"AND Count: {self.and_count}, "
             f"OR Count: {self.or_count}, "
-            f"Quantum State: {self.qu}\n"
         )
         
+        self.logs.append(log_entry)
         with open("ack_stats.log", "a") as f:
             f.write(log_entry)
             
+    def print_all_logs(self):
+        print("\nFull Session Log:")
+        print("-" * 80)
+        for log in self.logs:
+            print(log.strip())
+        print("-" * 80)
+
+  
     def run(self):
         try:
             while True:
@@ -203,14 +210,16 @@ class QuantumCommunicator:
                     self.last_status_update = current_time
                     
                 if cv2.waitKey(1) & 0xFF == ord('q'):
+                    self.print_all_logs()
                     break
                     
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
+            self.print_all_logs()
+            
     def plot_quantum_data(self):
         plt.figure(figsize=(12, 8))
         
-        # Plot ghost protocol states
         plt.subplot(2, 1, 1)
         if self.ghost_messages:
             time_points = list(range(len(self.ghost_messages)))
@@ -232,31 +241,23 @@ Quantum Communicator Status
 -------------------------
 Time: {datetime.now().strftime('%H:%M:%S')}
 Quantum State: {self.qu}
-Cycle: {self.cyc}/{len(self.numa.split(','))}
 Ghost Protocol: {self.ghostprotocol * self.range}
-
 
 Performance Metrics
 -----------------
-ACK Rate: {current_rate:.2f}/second
-Avg ACK Rate: {avg_rate:.2f}/second
-Total ACK: {self.ack} | NUL: {self.nul}
-AND Count: {self.and_count} | OR Count: {self.or_count}
+OR Count: {self.or_count}
 Motion Frames: {self.motion_frame_count}/{self.total_frames}
 -------------------------
 """)
 
-def send_message(self):
-    """Send a quantum message when conditions are met, could be a message or math."""
-    with open("input.txt", "r", encoding="utf-8") as f:
-        _input = f.read()
-    result = eval(_input)# enter any algorithm to solve
-    if result <= data[self.ghostprotocol * self.range]:
-        self.numa += ",".join('9' for _ in range(500)) #Paradox disruption
+    def send_message(self):
+        result = eval(problem)
+        if result <= data[self.ghostprotocol * self.range]:
+            self.numa += ",".join('9' for _ in range(500))
         
 if __name__ == "__main__":
     communicator = QuantumCommunicator()
     communicator.run()
-    self.capture.release()
+    communicator.capture.release()
     cv2.destroyAllWindows()
-   
+    input("Press enter to exit.")
