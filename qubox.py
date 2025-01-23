@@ -180,7 +180,8 @@ class QuantumCommunicator:
             f"Frame {self.i}, {current_time}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"OR Count: {self.or_count}\n "
+            f"OR Count: {self.or_count}, "
+            f"Problem: {problem}\n"
         )
         
         self.logs.append(log_entry)
@@ -247,6 +248,7 @@ Performance Metrics
 -----------------
 OR Count: {self.or_count}
 Motion Frames: {self.motion_frame_count}/{self.total_frames}
+Problem: {problem}
 -------------------------
 """)
 
