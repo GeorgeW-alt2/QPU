@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 from collections import deque
 
-PIN = random.randint(5000, 99999)
+PIN = random.randint(6000, 99999)
 spin = 1  # 1 or -1
 
 class QuantumCommunicator:
