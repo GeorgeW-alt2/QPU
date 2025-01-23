@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 from collections import deque
 
-PIN = random.randint(5000, 100000)
+PIN = random.randint(5000, 99999)
 spin = 1  # 1 or -1
 
 class QuantumCommunicator:
@@ -250,14 +250,15 @@ AND Count: {self.and_count} | OR Count: {self.or_count}
         plt.ylabel("State Value")
         plt.grid(True)
         
-        # Plot ACK rates
+        # Plot OR counts over time
         plt.subplot(2, 1, 2)
-        time_points = list(range(len(self.or_count)))
-        plt.plot(time_points, list(self.or_count), 'g-')
-        plt.title("ACK Rates Over Time")
-        plt.xlabel("Time Steps")
-        plt.ylabel("ACKs/Second")
+        time_points = list(range(len(self.or_counts)))
+        plt.plot(time_points, self.or_counts, 'r-', label='OR Count')
+        plt.title("OR Count Over Time")
+        plt.xlabel("Frame Number")
+        plt.ylabel("Cumulative OR Count")
         plt.grid(True)
+        plt.legend()
         
         plt.tight_layout()
         plt.show()
