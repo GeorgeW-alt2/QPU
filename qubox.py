@@ -181,7 +181,6 @@ class QuantumCommunicator:
             f"Total ACKs: {self.ack}, "
             f"Ghost Protocol: {self.ghostprotocol}, "
             f"Ghost Value: {self.ghostprotocol * self.range}, "
-            f"PIN: {self.PIN}, "
             f"AND Count: {self.and_count}, "
             f"OR Count: {self.or_count}, "
             f"Quantum State: {self.qu}, "
@@ -230,12 +229,10 @@ AND Count: {self.and_count} | OR Count: {self.or_count}
         finally:
             self.cleanup()
             
-    def cleanup(self):
+    def cleanupcleanup(self):
         if hasattr(self, 'capture'):
             self.capture.release()
         cv2.destroyAllWindows()
-        print("\nShutdown complete. Press Enter to view the plot...")
-        input()
         self.plot_quantum_data()
         
     def plot_quantum_data(self):
