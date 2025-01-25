@@ -50,7 +50,7 @@ class QuantumCommunicator:
         self.and_count = 0
         self.or_count = 0
         self.last_ghost_value = 0
-        self.range = int(input("Range(e.g, 10): "))
+        self.range = 1
         self.i = 0
 
     def calculate_ack_rate(self):
@@ -77,6 +77,7 @@ class QuantumCommunicator:
         
         if self.data2 is None:
             self.data2 = gray
+            problem = input("Enter text: ")
             return True
             
         frame_delta = cv2.absdiff(self.data2, gray)
@@ -170,7 +171,8 @@ class QuantumCommunicator:
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
             self.print_all_logs()
-
+            communicator.start_mining()
+            exit()
         
     def log_ack_stats(self):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -240,12 +242,12 @@ class QuantumCommunicator:
                     self.last_status_update = current_time
                     
                 if cv2.waitKey(1) & 0xFF == ord('q'):
-                    self.print_all_logs()
+                    #self.print_all_logs()
                     break
                     
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
-            self.print_all_logs()
+            #self.print_all_logs()
             
     def plot_quantum_data(self):
         plt.figure(figsize=(12, 8))
@@ -302,20 +304,19 @@ Motion Frames: {self.motion_frame_count}/{self.total_frames}
 """)
 
 
-    def send_message(self):
+def send_message(self):
         with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
             raw_text = f.read().split("\n")
-        result = raw_text[self.ghostprotocol * self.range]
-        if result <= self.ghostprotocol * self.range:
+ 
+        if result.split() in any(raw_text[self.ghostprotocol * self.range]):
             self.numa += ",".join('9' for _ in range(500))
         
 if __name__ == "__main__":
-    problem = input("Enter number: ")
+    
     while True:
-        try:
+       
             communicator = QuantumCommunicator()
             communicator.run()
-            communicator.start_mining()
-        except KeyboardInterrupt:
-            print("\nStarting mining process...")
+            
+       
          
