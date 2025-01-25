@@ -1,9 +1,1 @@
-Color centers, created by imperfections or vacancies in crystal lattices, interact with electromagnetic fields in ways that illuminate quantum processes. For instance, the absorption and emission spectra of amethyst and fluorite demonstrate how quantum systems react to external stimuli. By distinguishing their responses to green light and radiation, we uncover the underlying quantum mechanical rules governing these phenomena.
-
-Quantum mechanics predicts that even small changes in electromagnetic fields can cause measurable shifts in a system's behavior. These shifts, often described as the "smallest action," reflect the sensitivity of quantum systems to their environments. The concept of action, introduced by Planck, connects quantum mechanics with classical physics, bridging the microscopic and macroscopic worlds.
-
-4. The Density Matrix and State Vectors
-
-The density matrix provides a statistical representation of a quantum system, capturing both pure and mixed states. This framework is instrumental in understanding systems with decoherence or entanglement. By analyzing the state vectors within a density matrix, physicists can predict interference patterns and the probabilities of specific outcomes.
-
-Helicity, or the projection of a particle's spin along its momentum, plays a crucial role in defining the properties of quantum fields. Negative helicity states, often encountered in particle physics, illustrate the asymmetry and polarization effects intrinsic to quantum systems.
+An entangled ionizing UV photon on a doped amethyst, the electronic ground state of the defect is excited to a higher energy state that can be used for a quantum transistor in a lattice that can be logged with spectrum measurements.
