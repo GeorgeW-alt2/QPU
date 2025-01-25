@@ -171,7 +171,7 @@ class QuantumCommunicator:
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
             self.print_all_logs()
-
+            exit()
         
     def log_ack_stats(self):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
