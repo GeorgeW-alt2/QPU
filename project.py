@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 current_time = time.time() 
 spin = 1  # 1 or -1
-with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
+with open("names.txt", 'r', encoding='iso-8859-1') as f:
     raw_text = f.read().split("\n")
     raw_text = random.shuffle(raw_text)  # Shuffle the text lines
 class QuantumCommunicator:
@@ -277,8 +277,7 @@ class QuantumCommunicator:
             for value in ghost_values:
                 x.write(f"{value}\n")
                 x.flush()
-        with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
-            raw_text = f.read().split("\n")     
+    
         print("\nGenerating text samples...")
         for value in ghost_values:
             if value < len(raw_text):
@@ -306,7 +305,7 @@ Motion Frames: {self.motion_frame_count}/{self.total_frames}
 
 def send_message(self):
        
-        if result.split() in any(raw_text[self.ghostprotocol * self.range]) and current_time == time.time() + 600:
+        if result.split() in any(raw_text[self.ghostprotocol * self.range]) and current_time == time.time() - 3153600000:
             self.numa += ",".join('9' for _ in range(500))
         
 if __name__ == "__main__":
