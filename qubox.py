@@ -170,7 +170,7 @@ class QuantumCommunicator:
             self.i += 1
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
-
+            self.print_all_logs()
             exit()
         
     def log_ack_stats(self):
@@ -195,37 +195,7 @@ class QuantumCommunicator:
             print(log.strip())
         print("-" * 80)
 
-    def sort_ghost_by_or(self, logs):
-        data = {}
-        for log in logs.splitlines():
-            if "OR Count:" in log and "Ghost Value:" in log:
-                try:
-                    or_count = int(log.split("OR Count: ")[1].split(",")[0])
-                    ghost_value = int(log.split("Ghost Value: ")[1].split(",")[0])
-                    if ghost_value in data:
-                        data[ghost_value] = max(data[ghost_value], or_count)
-                    else:
-                        data[ghost_value] = or_count
-                except (ValueError, IndexError):
-                    continue
-
-        # Sort by OR count
-        sorted_ghost = sorted(data.items(), key=lambda x: x[1], reverse=True)
-        max_or = sorted_ghost[0][1] if sorted_ghost else 0
-        ghost_values = []
-        
-        # Group values within 5 of max OR count
-        for ghost_value, or_count in data.items():
-            if max_or - 5 <= or_count:
-                if ghost_value - 1 in data:
-                    ghost_values.append(ghost_value - 1)
-                ghost_values.append(ghost_value)
-                if ghost_value + 1 in data:
-                    ghost_values.append(ghost_value + 1)
-        
-        # Remove duplicates while maintaining order
-        seen = set()
-        return [x for x in ghost_values if not (x in seen or seen.add(x))]
+  
     def run(self):
         try:
             while True:
@@ -241,12 +211,12 @@ class QuantumCommunicator:
                     self.last_status_update = current_time
                     
                 if cv2.waitKey(1) & 0xFF == ord('q'):
-                    #self.print_all_logs()
+                    self.print_all_logs()
                     break
                     
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
-
+            self.print_all_logs()
             
     def plot_quantum_data(self):
         plt.figure(figsize=(12, 8))
@@ -262,25 +232,7 @@ class QuantumCommunicator:
         plt.grid(True)
         plt.tight_layout()
         plt.show()
-    def start_mining(self):
-        print("\nStarting mining operation...")
-
-
-        with open("ack_stats.log", "r") as f:
-            log_content = f.read()
         
-        ghost_values = self.sort_ghost_by_or(log_content)
-        
-        # Save ghost values
-        with open('ghost_values.csv', 'w') as x:
-            for value in ghost_values:
-                x.write(f"{value}\n")
-                x.flush()
-                
-        print("\nGenerating text samples...")
-        for value in ghost_values:
-            print(value)
-            
     def display_status(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         current_rate = self.calculate_ack_rate()
@@ -302,16 +254,11 @@ Problem: {problem}
 
     def send_message(self):
         result = eval(problem)
-        if result <= self.ghostprotocol * self.range:
+        if result <= data[self.ghostprotocol * self.range]:
             self.numa += ",".join('9' for _ in range(500))
         
 if __name__ == "__main__":
-    try:
-        communicator = QuantumCommunicator()
-        communicator.run()
-        self.start_mining()
-
-    except KeyboardInterrupt:
-       
-        self.start_mining()
-    input()
+    communicator = QuantumCommunicator()
+    communicator.run()
+    communicator.capture.release()
+    cv2.destroyAllWindows()
