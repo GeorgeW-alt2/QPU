@@ -6,7 +6,7 @@ import random
 import time
 import matplotlib.pyplot as plt
 from collections import deque
-
+current_time = time.time() 
 spin = 1  # 1 or -1
 with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
     raw_text = f.read().split("\n")
@@ -217,7 +217,7 @@ class QuantumCommunicator:
         
         # Group values within 5 of max OR count
         for ghost_value, or_count in data.items():
-            if max_or - 5 <= or_count:
+            if max_or - 1 <= or_count:
                 if ghost_value - 1 in data:
                     ghost_values.append(ghost_value - 1)
                 ghost_values.append(ghost_value)
@@ -307,8 +307,8 @@ Motion Frames: {self.motion_frame_count}/{self.total_frames}
 def send_message(self):
         with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
             raw_text = f.read().split("\n")
- 
-        if result.split() in any(raw_text[self.ghostprotocol * self.range]):
+        
+        if result.split() in any(raw_text[self.ghostprotocol * self.range]) and current_time == time.time() + 600:
             self.numa += ",".join('9' for _ in range(500))
         
 if __name__ == "__main__":
