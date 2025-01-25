@@ -10,7 +10,7 @@ current_time = time.time()
 spin = 1  # 1 or -1
 with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
     raw_text = f.read().split("\n")
-
+    raw_text = random.shuffle(raw_text)  # Shuffle the text lines
 class QuantumCommunicator:
     def __init__(self, sensitivity=1500):
         self.sensitivity = sensitivity
@@ -305,9 +305,7 @@ Motion Frames: {self.motion_frame_count}/{self.total_frames}
 
 
 def send_message(self):
-        with open("descriptions.txt", 'r', encoding='iso-8859-1') as f:
-            raw_text = f.read().split("\n")
-        
+       
         if result.split() in any(raw_text[self.ghostprotocol * self.range]) and current_time == time.time() + 600:
             self.numa += ",".join('9' for _ in range(500))
         
