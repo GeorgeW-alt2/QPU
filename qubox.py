@@ -170,7 +170,7 @@ class QuantumCommunicator:
             self.i += 1
         self.ghostprotocol -= -spin
         if (spin == -1 and self.ghostprotocol <= 0) or (spin == 1 and self.ghostprotocol >= 10000):
-            self.print_all_logs()
+
             exit()
         
     def log_ack_stats(self):
@@ -241,12 +241,12 @@ class QuantumCommunicator:
                     self.last_status_update = current_time
                     
                 if cv2.waitKey(1) & 0xFF == ord('q'):
-                    self.print_all_logs()
+                    #self.print_all_logs()
                     break
                     
         except KeyboardInterrupt:
             print("\nShutting down gracefully...")
-            self.print_all_logs()
+
             
     def plot_quantum_data(self):
         plt.figure(figsize=(12, 8))
@@ -309,8 +309,9 @@ if __name__ == "__main__":
     try:
         communicator = QuantumCommunicator()
         communicator.run()
-        communicator.start_mining()
-    except KeyboardInterrupt:
-        print("\nStarting mining process...")
-        communicator.start_mining()
+        self.start_mining()
 
+    except KeyboardInterrupt:
+       
+        self.start_mining()
+    input()
