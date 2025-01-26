@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 import random
 import time
-import matplotlib.pyplot as plt
 from collections import deque
 
 spin = 1  # 1 or -1
@@ -27,7 +26,7 @@ class QuantumCommunicator:
         self.start_time = datetime.now()
         self.prime_threshold = 0
         self.logged_or_counts = list()  # Set to track logged OR counts
-        
+        self.logs = list()
         with open("ack_stats.log", "w") as f:
             f.write("")
 
@@ -179,21 +178,21 @@ class QuantumCommunicator:
 
     def log_ack_stats(self):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.logged_or_counts.append(self.or_count)
-
-        if len(self.logged_or_counts) > 2:
-            if self.logged_or_counts[-2] == 3 and self.logged_or_counts[-3] != 3 and self.logged_or_counts[-1] != 3:
-                log_entry = (
+        log_entry = (
                     f"Frame {self.i}, {current_time}, "
                     f"Ghost Protocol: {self.ghostprotocol}, "
                     f"Ghost Value: {self.ghostprotocol * self.range}, "
                     f"OR Count: {self.or_count}, "
                     f"Problem: {problem}\n"
                 )
-        
-                self.logs.append(log_entry)
+        self.logs.append(log_entry)
+        self.logged_or_counts.append(self.or_count)
+        if len(self.logged_or_counts) > 2:
+            if self.logged_or_counts[-2] == 3 and self.logged_or_counts[-1] != 3 and self.logged_or_counts[-3] != 3:
+
+                
                 with open("ack_stats.log", "a") as f:
-                    f.write(log_entry)
+                    f.write(self.logs[-2])
 
     def print_all_logs(self):
         print("\nFull Session Log:")
