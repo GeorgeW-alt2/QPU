@@ -108,7 +108,7 @@ class QuantumCommunicator:
     def apply_quantum_logic(self, row, col):
         if 4 < row < 11:
             self.or_count += 1
-            return
+
             if 4 < col < 11:
                 self.and_count += 1
                 self.process_quantum_state()
