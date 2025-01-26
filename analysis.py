@@ -45,3 +45,5 @@ result = analyze_frame_gaps(log_data)
 print(f"Largest gap: {result['gap_size']} frames")
 print(f"Between frames: {result['start_frame']} and {result['end_frame']}")
 print(f"Time difference: {result['time_diff'].total_seconds()} seconds")
+while True:
+    False
