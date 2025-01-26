@@ -98,10 +98,10 @@ class QuantumCommunicator:
         return np.sum(quadrant > 10) > self.sensitivity
 
     def apply_quantum_logic(self, row, col):
-        if not 4 < row < 11:
+        if 4 < row < 11:
             self.or_count += 1
 
-            if not 4 < col < 11:
+            if 4 < col < 11:
                 self.and_count += 1
                 self.process_quantum_state()
 
