@@ -34,7 +34,7 @@ class QuantumCommunicator:
         self.qu = 0
         self.cyc = 0
         self.swi = 0
-        self.longcyc = 200
+        self.longcyc = 3
         random.seed(int(time.time()))
         self.numa = ",".join(str(np.random.randint(0, 2)) for _ in range(100000))
         self.corr = 3
@@ -140,9 +140,9 @@ class QuantumCommunicator:
         self.swi += 1
         self.nul += 1
         self.prime = min(self.prime + 1, self.prime_threshold)
-        self.advance_cycle()
         if self.qu == 1:
             self.qu = 0
+            self.advance_cycle()
 
         if self.qu == 0:
             self.qu = 1
@@ -168,7 +168,7 @@ class QuantumCommunicator:
     def update_ghost_protocol(self):
         current_value = self.ghostprotocol * self.range
         if self.prime < 1:
-            if current_value != self.last_ghost_value:
+            if current_value == self.last_ghost_value:
                 self.last_ghost_value = current_value
                 self.i = self.i if hasattr(self, 'i') else 0
         self.i += 1
@@ -240,7 +240,7 @@ Problem: {problem}
 
     def send_message(self):
         result = eval(problem)
-        if result <= data[self.ghostprotocol * self.range]:
+        if result <= self.ghostprotocol * self.range:
             self.numa += ",".join('9' for _ in range(500))
 
 if __name__ == "__main__":
